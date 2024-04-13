@@ -1,0 +1,57 @@
+#RGB TO GRAY SCALE
+import cv2
+from google.colab.patches import cv2_imshow
+image = cv2.imread("/content/drive/MyDrive/SEM 6/CG LAB/image processing/image.jpeg")
+
+gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+cv2_imshow(gray)
+
+#######################################################
+
+EDGE DETECTION
+
+import numpy as np
+import cv2 as cv
+from matplotlib import pyplot as plt
+ 
+img = cv.imread('/content/drive/MyDrive/SEM 6/CG LAB/image processing/image.jpeg')
+edges = cv.Canny(img,100,200)
+ 
+plt.subplot(121),plt.imshow(img,cmap = 'brg')
+plt.title('Original Image'), plt.xticks([]), plt.yticks([])
+plt.subplot(122),plt.imshow(edges,cmap = 'brg')
+plt.title('Edge Image'), plt.xticks([]), plt.yticks([])
+ 
+plt.show()
+
+########################################################
+
+HISTOGRAM PLOT
+
+import numpy as np
+import cv2 as cv
+from matplotlib import pyplot as plt
+ 
+img = cv.imread('/content/drive/MyDrive/SEM 6/CG LAB/image processing/image.jpeg', cv.IMREAD_GRAYSCALE)
+ 
+hist,bins = np.histogram(img.flatten(),256,[0,256])
+ 
+cdf = hist.cumsum()
+cdf_normalized = cdf * float(hist.max()) / cdf.max()
+ 
+plt.plot(cdf_normalized, color = 'b')
+plt.hist(img.flatten(),256,[0,256], color = 'r')
+plt.xlim([0,256])
+plt.legend(('cdf','histogram'), loc = 'upper left')
+plt.show()
+
+#####################################################
+
+HISTOGRAM EQUALIZATION
+
+from google.colab.patches import cv2_imshow
+img = cv.imread('/content/drive/MyDrive/SEM 6/CG LAB/image processing/image.jpeg', cv.IMREAD_GRAYSCALE)
+
+equ = cv.equalizeHist(img)
+res = np.hstack((img,equ)) #stacking images side-by-side
+cv2_imshow(equ)
