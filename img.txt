@@ -1,3 +1,250 @@
+LAPLACIAN EDGE DETECTION
+
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Apr 12 18:21:53 2024
+
+@author: shwet
+"""
+
+import cv2
+
+def laplacian_edge_detection(image_path):
+    # Read the image
+    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+    # Apply Laplacian edge detection
+    laplacian_edge = cv2.Laplacian(image, cv2.CV_64F)
+    
+    # Apply thresholding to highlight edges
+    threshold_value = 30
+    _, laplacian_edge_thresholded = cv2.threshold(laplacian_edge, threshold_value, 255, cv2.THRESH_BINARY)
+
+    return laplacian_edge_thresholded
+
+# Example usage
+image_path = "img.png"
+laplacian_edges = laplacian_edge_detection(image_path)
+
+# Display the result
+cv2.imshow("Laplacian Edges", laplacian_edges)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+###########################################################
+GAUSSIAN EDGE DETECTION
+
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Apr 12 18:23:27 2024
+
+@author: shwet
+"""
+
+import cv2
+
+def log_edge_detection(image_path):
+    # Read the image
+    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+    # Apply Gaussian blur
+    blurred_image = cv2.GaussianBlur(image, (3, 3), 0)
+
+    # Apply Laplacian of Gaussian (LoG)
+    log_edge = cv2.Laplacian(blurred_image, cv2.CV_64F)
+    
+    # Apply thresholding to highlight edges
+    threshold_value = 20
+    _, log_edge_thresholded = cv2.threshold(log_edge, threshold_value, 255, cv2.THRESH_BINARY)
+
+    return log_edge
+
+# Example usage
+image_path = "img.png"
+log_edges = log_edge_detection(image_path)
+
+# Display the result
+cv2.imshow("Laplacian of Gaussian Edges", log_edges)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+
+########################################################3
+
+SOBEL EDGE DETECTION
+
+
+
+import cv2
+
+def sobel_edge_detection(image_path):
+    # Read the image
+    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+    # Apply Sobel edge detection
+    sobel_x = cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=3)
+    sobel_y = cv2.Sobel(image, cv2.CV_64F, 0, 1, ksize=3)
+    sobel_edge = cv2.magnitude(sobel_x, sobel_y)
+
+    # Apply threshold to highlight edges
+    threshold_value = 50
+    _, sobel_edge_thresholded = cv2.threshold(sobel_edge, threshold_value, 255, cv2.THRESH_BINARY)
+
+    return sobel_edge_thresholded
+
+# Example usage
+image_path = "img.png"
+sobel_edges = sobel_edge_detection(image_path)
+
+# Display the result
+cv2.imshow("Sobel Edges", sobel_edges)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+#####################################################
+
+
+SHARPEN IMAGE
+
+import cv2
+import numpy as np
+
+def sharpen_image(image):
+    # Convert image to grayscale
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    # Apply Laplacian operator
+    laplacian = cv2.Laplacian(gray_image, cv2.CV_64F)
+
+    # Convert Laplacian to 3-channel image
+    laplacian_3channels = cv2.merge([laplacian, laplacian, laplacian])
+
+    # Adding Laplacian to original image to sharpen it
+    sharpened_image = np.uint8(np.clip(image + laplacian_3channels, 0, 255))
+
+    return sharpened_image
+
+# Example usage
+image = cv2.imread("img.png")
+sharpened_image = sharpen_image(image)
+cv2.imshow("Sharpened Image", sharpened_image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+
+############################################################3
+
+SAMPLING
+
+
+#image sampling 
+# Import cv2, matplotlib, numpy 
+import cv2 
+import matplotlib.pyplot as plt 
+import numpy as np 
+
+
+# Read the original image and know its type 
+img1 = cv2.imread('img.png', 0) 
+
+# Obtain the size of the original image 
+[m, n] = img1.shape 
+print('Image Shape:', m, n) 
+
+# Show original image 
+print('Original Image:') 
+plt.imshow(img1, cmap="gray") 
+
+
+# Down sampling 
+
+# Assign a down sampling rate 
+# Here we are down sampling the 
+# image by 4 
+f = 2
+
+# Create a matrix of all zeros for 
+# downsampled values 
+img2 = np.zeros((m//f, n//f), dtype=np.int) 
+
+# Assign the down sampled values from the original 
+# image according to the down sampling frequency. 
+# For example, if the down sampling rate f=2, take 
+# pixel values from alternate rows and columns 
+# and assign them in the matrix created above 
+for i in range(0, m, f): 
+	for j in range(0, n, f): 
+		try: 
+
+			img2[i//f][j//f] = img1[i][j] 
+		except IndexError: 
+			pass
+
+
+# Show down sampled image 
+print('Down Sampled Image:') 
+plt.imshow(img2, cmap="gray") 
+
+
+# Up sampling 
+
+# Create matrix of zeros to store the upsampled image 
+img3 = np.zeros((m, n), dtype=np.int) 
+# new size 
+for i in range(0, m-1, f): 
+	for j in range(0, n-1, f): 
+		img3[i, j] = img2[i//f][j//f] 
+
+# Nearest neighbour interpolation-Replication 
+# Replicating rows 
+
+for i in range(1, m-(f-1), f): 
+	for j in range(0, n-(f-1)): 
+		img3[i:i+(f-1), j] = img3[i-1, j] 
+
+# Replicating columns 
+for i in range(0, m-1): 
+	for j in range(1, n-1, f): 
+		img3[i, j:j+(f-1)] = img3[i, j-1] 
+
+# Plot the up sampled image 
+print('Up Sampled Image:') 
+plt.imshow(img3, cmap="gray") 
+###########################################################
+
+
+PREWITT EDGE DETECTION
+
+import cv2
+
+def prewitt_edge_detection(image_path):
+    # Read the image
+    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+    # Apply Prewitt edge detection
+    kernel_x = cv2.getDerivKernels(1, 0, 3, normalize=True)
+    kernel_y = cv2.getDerivKernels(0, 1, 3, normalize=True)
+    prewitt_x = cv2.filter2D(image, cv2.CV_64F, kernel_x[0] * kernel_x[1].T)
+    prewitt_y = cv2.filter2D(image, cv2.CV_64F, kernel_y[0] * kernel_y[1].T)
+    prewitt_edge = cv2.magnitude(prewitt_x, prewitt_y)
+    
+    # Apply threshold to highlight edges
+    threshold_value = 20
+    _, prewitt_edge_thresholded = cv2.threshold(prewitt_edge, threshold_value, 255, cv2.THRESH_BINARY)
+
+    return prewitt_edge_thresholded
+
+# Example usage
+image_path = "img.png"
+prewitt_edges = prewitt_edge_detection(image_path)
+
+# Display the result
+cv2.imshow("Prewitt Edges", prewitt_edges)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+###############################################################
+
+
 #RGB TO GRAY SCALE
 import cv2
 from google.colab.patches import cv2_imshow
@@ -8,7 +255,7 @@ cv2_imshow(gray)
 
 #######################################################
 
-EDGE DETECTION
+CANNY EDGE DETECTION
 
 import numpy as np
 import cv2 as cv
@@ -124,33 +371,6 @@ cv.imshow("Masked", mask)
 cv.waitKey(0)
 cv.imshow("Green", res)
 cv.waitKey(0)
-
-#############################################################
-
-# EDGE DETECTION
-
-import numpy as np
-import cv2 as cv
-from matplotlib import pyplot as plt
- 
-img = cv.imread('sudoku.jpg', cv.IMREAD_GRAYSCALE)
- 
-laplacian = cv.Laplacian(img, cv.CV_64F)
-sobelx = cv.Sobel(img, cv.CV_64F, 1, 0, ksize = 5)
-sobely = cv.Sobel(img, cv.CV_64F, 0, 1, ksize = 5)
- 
-plt.subplot(2, 2, 1), plt.imshow(img, cmap = 'gray')
-plt.title('Original'), plt.xticks([]), plt.yticks([])
-
-plt.subplot(2, 2, 2), plt.imshow(laplacian, cmap = 'gray')
-plt.title('Laplacian'), plt.xticks([]), plt.yticks([])
-
-plt.subplot(2, 2, 3), plt.imshow(sobelx, cmap = 'gray')
-plt.title('Sobel X'), plt.xticks([]), plt.yticks([])
-
-plt.subplot(2, 2, 4), plt.imshow(sobely, cmap = 'gray')
-plt.title('Sobel Y'), plt.xticks([]), plt.yticks([])
-
 
 ################################################################
 # HISTOGRAM EQUALIZATION
